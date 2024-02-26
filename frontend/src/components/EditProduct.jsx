@@ -1,19 +1,31 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 
-function AddProduct(){
+function EditProduct(){
 
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
 
     const navigate = useNavigate();
 
-    const saveProduct = async (e)=>{
+    const {id}= useParams();
+
+    useEffect(()=>{
+        const getProductById= async()=>{
+            const response = await axios.get(`http://localhost:5000/products/${id}`);
+            setName(response.data.name)
+            setPrice(response.data.price)
+        };
+
+        getProductById();
+    }, [id]);
+
+    const updateProduct = async (e)=>{
         e.preventDefault();
-        await axios.post("http://localhost:5000/products",{
+        await axios.patch(`http://localhost:5000/products/${id}`,{
             name:name,
             price:parseInt(price)
         });
@@ -24,7 +36,7 @@ function AddProduct(){
         <div className="container mt-5">
             <Link to="/" className="bg-green-500 hover:bg-green-700 border-slate-200 text-white font-bold py-2 px-4 rounded-lg">Kembali</Link>
             <div className="max-w-lg mx-auto my-10 bg-white p-8 rounded-xl shadow shadow-slate-300">
-                <form onSubmit={saveProduct} className="my-10">
+                <form onSubmit={updateProduct} className="my-10">
 
 
                     <div className="flex flex-col">
@@ -44,7 +56,7 @@ function AddProduct(){
                             />
 
                         </div>
-                        <button type="submit" className="w-full py-3 font-bold text-white bg-indigo-600 hover:bg-indigo-500">Save</button>
+                        <button type="submit" className="w-full py-3 font-bold text-white bg-indigo-600 hover:bg-indigo-500">Update</button>
                     </div>
                 </form>
             </div>
@@ -53,4 +65,4 @@ function AddProduct(){
 }
 
 
-export default AddProduct;
+export default EditProduct;
